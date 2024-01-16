@@ -33,7 +33,18 @@ class XmlNode:
 
     @classmethod
     def parse(cls, data: Any) -> XmlNode:
-        """Parse Comprehensive format into an XmlNode object."""
+        """Parse Comprehensive format into an XmlNode object.
+        Ex)
+        XmlNode.parse(
+        {
+            "name": "node",
+            "attributes": {"attr1": "value1", "attr2": "value2"},
+            "body": [
+                {"name": "child1", "attributes": {"attr1": "value1"}},
+                {"name": "child2", "attributes": {"attr2": "value2"}},
+            ],
+        }
+        """
         if isinstance(data, dict):
             return cls(
                 data["name"],

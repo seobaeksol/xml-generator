@@ -92,7 +92,9 @@ class XmlNode:
         Query can be a name or a path.
         Query consists of a name and a list of attributes.
         Attributes are separated by a at sign.
-        Ex) node_name@attr1@attr2
+        Ex) node_name@attr1=value1@attr2
+        : find a node with the name node_name that has the attributes attr1 and attr2
+          and attr1 has the value value1. (attr2 just needs to exist)
         """
         if "@" in query:
             name, *attributes = query.split("@")
@@ -104,10 +106,47 @@ class XmlNode:
             return False
 
         for attribute in attributes:
-            if attribute not in node.attributes:
+            if "=" in attribute:
+                attr_key, attr_value = attribute.split("=")
+            else:
+                attr_key = attribute
+                attr_value = None
+
+            if attr_key not in node.attributes:
+                return False
+
+            # No attribute value means that the attribute just needs to exist
+            if attr_value is not None and node.attributes[attr_key] != attr_value:
                 return False
 
         return True
+
+    @classmethod
+    def from_query(cls, query: str) -> XmlNode:
+        """
+        Return the XmlNode with the given query.
+        Query can be a name with attributes.
+        Ex) node_name@attr1=value1@attr2
+        : find a node with the name node_name that has the attributes attr1 and attr2
+          and attr1 has the value value1. (attr2 just needs to exist)
+        """
+        if "@" in query:
+            name, *raw_attributes = query.split("@")
+        else:
+            name = query
+            raw_attributes = []
+
+        attributes = {}
+        for attribute in raw_attributes:
+            if "=" in attribute:
+                attr_key, attr_value = attribute.split("=")
+            else:
+                attr_key = attribute
+                attr_value = None
+
+            attributes[attr_key] = attr_value
+
+        return XmlNode(name, attributes)
 
     def to_xml(
         self,
@@ -141,3 +180,27 @@ class XmlNode:
     def _attributes_to_xml(self) -> str:
         """Return the XmlNode's attributes as an XML string."""
         return " ".join(f'{key}="{value}"' for key, value in self.attributes.items())
+
+    def get_or_create_with_queries(self, queries: list[str]) -> XmlNode:
+        """Return the XmlNode with the given names."""
+        node = self
+        for query in queries:
+            if node.children is None:
+                node.body = []
+            found_child = next(
+                (child for child in node.children if XmlNode.check(child, query)), None
+            )
+            if found_child is None:
+                found_child = XmlNode.from_query(query)
+                node.body.append(found_child)
+            node = found_child
+        return node
+
+    def __str__(self) -> str:
+        body_info = (
+            self.body if isinstance(self.body, str) else f"children={len(self.body)}"
+        )
+
+        return (
+            f"XmlNode(name={self.name}, attributes={self.attributes}, body={body_info})"
+        )

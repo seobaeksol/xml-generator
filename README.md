@@ -63,6 +63,24 @@ with open('sample.xml', 'w', encoding='utf-8') as f:
 
 Coming soon.
 
+### Testing
+
+```bash
+python -m unittest discover -s xml_generator/tests -p "test*.py"
+```
+
+### Building
+
+```bash
+python .\setup.py sdist bdist_wheel
+```
+
+### Deployment
+
+```bash
+python .\setup.py sdist bdist_wheel
+```
+
 ## License
 
 License :: OSI Approved :: MIT License

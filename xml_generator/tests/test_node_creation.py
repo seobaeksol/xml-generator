@@ -1,6 +1,6 @@
 import unittest
 
-from xml_generator.types import XmlNode
+from xml_generator import XmlNode
 
 
 class NodeCreationTestCase(unittest.TestCase):

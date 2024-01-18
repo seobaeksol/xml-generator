@@ -78,7 +78,7 @@ python .\setup.py sdist bdist_wheel
 ### Deployment
 
 ```bash
-python .\setup.py sdist bdist_wheel
+twine upload dist/*
 ```
 
 ## License

@@ -1,0 +1,4 @@
+<node attr1="value1" attr2="value2">
+    <child1 attr1="value1"/>
+    <child2 attr2="value2"/>
+</node>

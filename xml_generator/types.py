@@ -1,5 +1,6 @@
 from __future__ import annotations
-from typing import Any
+from typing import Any, override
+from xml.etree.ElementTree import TreeBuilder
 
 
 Query = str
@@ -12,10 +13,12 @@ class XmlNode:
         name: str,
         attributes: dict = None,
         body: str | list[XmlNode] = None,
+        parent: XmlNode = None,
     ) -> None:
         self.name = name
         self.attributes = attributes if attributes else {}
         self.body = body
+        self.parent = parent
 
     def __eq__(self, __value: object) -> bool:
         if not isinstance(__value, XmlNode):
@@ -176,9 +179,12 @@ class XmlNode:
         declaration: bool = False,
         indent_char: str = " ",
         indent_size: int = 4,
-        declaration_tag: str = '<?xml version="1.0" encoding="UTF-8"?>\n',
+        declaration_tag: str = '<?xml version="1.0" encoding="utf-8"?>\n',
     ) -> str:
-        """Return the XmlNode as an XML string."""
+        """
+        Return the XmlNode as an XML string.
+        TODO: remove tag end spaces
+        """
         xml = declaration_tag if declaration else ""
         indent = indent_char * indent_size * depth
 
@@ -298,3 +304,65 @@ class XmlNode:
         return (
             f"XmlNode(name={self.name}, attributes={self.attributes}, body={body_info})"
         )
+
+
+class XmlParser(TreeBuilder):
+    default_ns = ""
+    ns_stack = []
+    ns_dict = {}
+    current = None
+
+    @override
+    def start(self, tag, attrs):
+        name = tag.replace(f"{{{self.default_ns}}}", "")
+        # Handle root's namespace
+        if self.current is None:
+            new_attrs = {}
+            if self.default_ns:
+                new_attrs["xmlns"] = self.default_ns
+
+            for prefix, uri in self.ns_dict.items():
+                new_attrs[f"xmlns:{prefix}"] = uri
+
+            for prefix, uri in self.ns_dict.items():
+                for key, value in attrs.items():
+                    if key.startswith(f"{{{uri}}}"):
+                        new_attrs[key.replace(f"{{{uri}}}", f"{prefix}:")] = value
+
+            self.current = XmlNode(name, new_attrs)
+            return
+
+        self.current = XmlNode(name, attrs, parent=self.current)
+        if self.current.parent is None:
+            return
+
+        if not isinstance(self.current.parent.body, list):
+            self.current.parent.body = []
+        self.current.parent.body.append(self.current)
+
+    @override
+    def start_ns(self, prefix, uri):
+        if prefix == "":
+            self.default_ns = uri
+        else:
+            self.ns_stack.append((prefix, uri))
+            self.ns_dict[prefix] = uri
+
+    @override
+    def end_ns(self, prefix):
+        if prefix != "":
+            self.ns_stack.pop()
+
+    @override
+    def end(self, tag):
+        if self.current.parent is not None:
+            self.current = self.current.parent
+
+    @override
+    def data(self, data):
+        if not data.isspace():
+            self.current.body = data
+
+    @override
+    def close(self):
+        return self.current

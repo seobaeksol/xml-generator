@@ -40,6 +40,23 @@ node = XmlNode.parse(
 )
 ```
 
+Parse Comprehensive format with quries
+
+```python
+node = XmlNode.from_query('node@attr1="value1"@attr2="value2"')
+```
+
+```python
+nodes = XmlNode.from_queries(
+    {
+        "node@attr1='value1'@attr2='value2'": {
+            "child1@attr1='value1'": None,
+            "child2@attr2='value2'": None,
+        }
+    }
+)
+```
+
 ### Searching a specific node
 
 Return the first XmlNode with the given query. Query can be a name with attributes.

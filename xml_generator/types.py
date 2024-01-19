@@ -2,6 +2,10 @@ from __future__ import annotations
 from typing import Any
 
 
+Query = str
+QueryDict = dict[Query, dict | str | None]
+
+
 class XmlNode:
     def __init__(
         self,
@@ -155,7 +159,14 @@ class XmlNode:
                 attr_key = attribute
                 attr_value = None
 
-            attributes[attr_key] = attr_value
+            attributes[attr_key] = (
+                attr_value.removeprefix('"')
+                .removesuffix('"')
+                .removeprefix("'")
+                .removesuffix("'")
+                if attr_value is not None
+                else None
+            )
 
         return XmlNode(name, attributes)
 
@@ -206,6 +217,54 @@ class XmlNode:
                 node.body.append(found_child)
             node = found_child
         return node
+
+    @classmethod
+    def from_queries(cls, queries: QueryDict) -> list[XmlNode]:
+        """
+        Return the XmlNode with the given queries.
+        ex) queries = {
+            "node1@attr1=value1": {
+                'node3@attr3=value3': 'content_value',
+                'node4@attr4=value4': None,
+            },
+            "node2@attr2=value2": None,
+        }
+        """
+        nodes = []
+        for query, body in queries.items():
+            node = XmlNode.from_query(query)
+            if isinstance(body, str):
+                node.body = body
+            elif isinstance(body, dict):
+                node.append_queries(body)
+            else:
+                node.body = None
+            nodes.append(node)
+
+        return nodes
+
+    def append_queries(self, queries: QueryDict) -> list[XmlNode]:
+        """
+        With the given queries, append the XmlNode objects into children and return it.
+        ex) queries = {
+            "node1@attr1=value1": {
+                'node3@attr3=value3': 'content_value',
+                'node4@attr4=value4': None,
+            },
+            "node2@attr2=value2": None,
+        }
+        """
+        if self.children is None:
+            self.body = []
+
+        if isinstance(self.body, str):
+            raise ValueError("Cannot append queries to a XmlNode with a body string")
+
+        nodes = XmlNode.from_queries(queries)
+
+        self.body.extend(nodes)
+
+        return nodes
 
     def __str__(self) -> str:
         body_info = (

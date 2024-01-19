@@ -1,4 +1,4 @@
-# Project Name
+# XML Generator
 
 Comprehensive XML generator for Python
 

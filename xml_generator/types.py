@@ -219,7 +219,7 @@ class XmlNode:
         return node
 
     @classmethod
-    def from_queries(cls, queries: Any) -> list[XmlNode]:
+    def from_queries(cls, queries: list[str | dict]) -> list[XmlNode]:
         """
         Return the XmlNode with the given queries.
         ex) queries = [
@@ -260,7 +260,7 @@ class XmlNode:
 
         return nodes
 
-    def append_queries(self, queries: QueryDict) -> list[XmlNode]:
+    def append_queries(self, queries: list[str | dict]) -> list[XmlNode]:
         """
         With the given queries, append the XmlNode objects into children and return it.
         ex) queries = [

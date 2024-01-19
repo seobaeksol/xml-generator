@@ -219,40 +219,64 @@ class XmlNode:
         return node
 
     @classmethod
-    def from_queries(cls, queries: QueryDict) -> list[XmlNode]:
+    def from_queries(cls, queries: Any) -> list[XmlNode]:
         """
         Return the XmlNode with the given queries.
-        ex) queries = {
-            "node1@attr1=value1": {
-                'node3@attr3=value3': 'content_value',
-                'node4@attr4=value4': None,
-            },
-            "node2@attr2=value2": None,
-        }
+        ex) queries = [
+                "NoValueNode",
+                {
+                    "SHORT-NAME": "node",
+                },
+                {
+                    "ELEMENTS@type='string'": [
+                        "element@hint='id'",
+                        "element@unit='m'",
+                        {"element@unit='m'@min='0'@max='100'@init='50'": "100"},
+                    ],
+                },
+            ]
+        ]
         """
         nodes = []
-        for query, body in queries.items():
-            node = XmlNode.from_query(query)
-            if isinstance(body, str):
-                node.body = body
-            elif isinstance(body, dict):
-                node.append_queries(body)
-            else:
-                node.body = None
-            nodes.append(node)
+        if not isinstance(queries, list):
+            raise TypeError(
+                f"Cannot parse {type(queries)} into XmlNode, it must be a list"
+            )
+
+        for query in queries:
+            if isinstance(query, str):
+                nodes.append(XmlNode.from_query(query))
+            elif isinstance(query, dict):
+                for key, value in query.items():
+                    node = XmlNode.from_query(key)
+                    if value is None:
+                        nodes.append(node)
+                    elif isinstance(value, str):
+                        node.body = value
+                        nodes.append(node)
+                    elif isinstance(value, list):
+                        node.body = XmlNode.from_queries(value)
+                        nodes.append(node)
 
         return nodes
 
     def append_queries(self, queries: QueryDict) -> list[XmlNode]:
         """
         With the given queries, append the XmlNode objects into children and return it.
-        ex) queries = {
-            "node1@attr1=value1": {
-                'node3@attr3=value3': 'content_value',
-                'node4@attr4=value4': None,
-            },
-            "node2@attr2=value2": None,
-        }
+        ex) queries = [
+                "NoValueNode",
+                {
+                    "SHORT-NAME": "node",
+                },
+                {
+                    "ELEMENTS@type='string'": [
+                        "element@hint='id'",
+                        "element@unit='m'",
+                        {"element@unit='m'@min='0'@max='100'@init='50'": "100"},
+                    ],
+                },
+            ]
+        ]
         """
         if self.children is None:
             self.body = []

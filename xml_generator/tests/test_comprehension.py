@@ -34,19 +34,64 @@ class ComprehensionTestCase(unittest.TestCase):
 
     def test_queries_creation(self):
         nodes = XmlNode.from_queries(
+            [
+                "NoValueNode",
+                {
+                    "SHORT-NAME": "node",
+                },
+                {
+                    "ELEMENTS@type='string'": [
+                        "element@hint='id'",
+                        "element@unit='m'",
+                        {"element@unit='m'@min='0'@max='100'@init='50'": "100"},
+                    ],
+                },
+            ]
+        )
+
+        self.assertEqual(len(nodes), 3)
+        self.assertEqual(nodes[0].name, "NoValueNode")
+        self.assertIsNone(nodes[0].body)
+        self.assertEqual(nodes[1].name, "SHORT-NAME")
+        self.assertEqual(nodes[1].body, "node")
+        self.assertEqual(len(nodes[2].children), 3)
+        self.assertEqual(nodes[2].children[0].name, "element")
+        self.assertEqual(nodes[2].children[1].name, "element")
+        self.assertEqual(nodes[2].children[0].attributes, {"hint": "id"})
+        self.assertEqual(nodes[2].children[1].attributes, {"unit": "m"})
+        self.assertEqual(
+            nodes[2].children[2].attributes,
+            {"unit": "m", "min": "0", "max": "100", "init": "50"},
+        )
+        self.assertEqual(nodes[2].children[2].body, "100")
+
+    def test_comprehensive_append(self):
+        node = XmlNode.parse(
             {
-                "node@attr1='value1'@attr2='value2'": {
-                    "child1@attr1='value1'": None,
-                    "child2@attr2='value2'": None,
-                }
+                "name": "node",
+                "attributes": {"attr1": "value1", "attr2": "value2"},
+                "body": [
+                    {"name": "child1", "attributes": {"attr1": "value1"}},
+                    {"name": "child2", "attributes": {"attr2": "value2"}},
+                ],
             }
         )
 
-        self.assertEqual(len(nodes), 1)
-        self.assertEqual(nodes[0].name, "node")
-        self.assertEqual(nodes[0].attributes, {"attr1": "value1", "attr2": "value2"})
-        self.assertEqual(len(nodes[0].children), 2)
-        self.assertEqual(nodes[0].children[0].name, "child1")
-        self.assertEqual(nodes[0].children[1].name, "child2")
-        self.assertEqual(nodes[0].children[0].attributes, {"attr1": "value1"})
-        self.assertEqual(nodes[0].children[1].attributes, {"attr2": "value2"})
+        nodes = node.append_queries(
+            [
+                "NoValueNode",
+                {
+                    "SHORT-NAME": "node",
+                },
+                {
+                    "ELEMENTS@type='string'": [
+                        "element@hint='id'",
+                        "element@unit='m'",
+                        {"element@unit='m'@min='0'@max='100'@init='50'": "100"},
+                    ],
+                },
+            ]
+        )
+
+        self.assertEqual(len(node.children), 5)
+        self.assertEqual(nodes, node.children[2:])

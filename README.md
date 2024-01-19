@@ -48,12 +48,19 @@ node = XmlNode.from_query('node@attr1="value1"@attr2="value2"')
 
 ```python
 nodes = XmlNode.from_queries(
-    {
-        "node@attr1='value1'@attr2='value2'": {
-            "child1@attr1='value1'": None,
-            "child2@attr2='value2'": None,
-        }
-    }
+    [
+        "NoValueNode",
+        {
+            "SHORT-NAME": "node",
+        },
+        {
+            "ELEMENTS@type='string'": [
+                "element@hint='id'",
+                "element@unit='m'",
+                {"element@unit='m'@min='0'@max='100'@init='50'": "100"},
+            ],
+        },
+    ]
 )
 ```
 

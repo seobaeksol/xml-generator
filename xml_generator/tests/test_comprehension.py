@@ -1,10 +1,5 @@
 import unittest
 
-import sys
-
-sys.path.append("../../")
-sys.path.append("../")
-sys.path.append("C:\\Users\\F2023027\\Desktop\\Projects\\xml-generator")
 from xml_generator import XmlNode
 
 

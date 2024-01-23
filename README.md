@@ -40,28 +40,30 @@ node = XmlNode.parse(
 )
 ```
 
-Parse Comprehensive format with quries
+Create a XmlNode with a query
 
 ```python
 node = XmlNode.from_query('node@attr1="value1"@attr2="value2"')
 ```
 
+Create a XmlNode with a extended query
+
 ```python
-nodes = XmlNode.from_queries(
-    [
-        "NoValueNode",
-        {
-            "SHORT-NAME": "node",
-        },
-        {
-            "ELEMENTS@type='string'": [
-                "element@hint='id'",
-                "element@unit='m'",
-                {"element@unit='m'@min='0'@max='100'@init='50'": "100"},
-            ],
-        },
-    ]
-)
+extend_query = {
+            "root": [
+                "NoValueNode",
+                {
+                    "SHORT-NAME": "node",
+                },
+                {
+                    "ELEMENTS@type=string": [
+                        "element@hint=id",
+                        "element@unit=m",
+                        {"element@unit=m@min=0@max=100@init=50": "100"},
+                    ],
+                },
+            ]
+        }
 ```
 
 ### Searching a specific node
@@ -74,7 +76,7 @@ child1 = node.find("child1@attr1")
 child2 = node.find("child2")
 ```
 
-### Generate a xml file
+### Serialization
 
 Using the `to_xml()` function that return the XmlNode as an XML string.
 
@@ -83,7 +85,13 @@ with open('sample.xml', 'w', encoding='utf-8') as f:
     f.write(node.to_xml())
 ```
 
-### Read a xml file
+Using the `to_extend_query()` function that return the extended query object as an XML string.
+
+```python
+extended_query_obj = root.to_extended_query()
+```
+
+### Deserialization
 
 Use `XmlParser` class for reading a xml file that return `XmlNode` by `close()` method.
 It is sub-class of `xml.etree.ElementTree.XMLParser` built-in python class.

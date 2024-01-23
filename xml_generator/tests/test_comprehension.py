@@ -26,14 +26,16 @@ class ComprehensionTestCase(unittest.TestCase):
         self.assertEqual(node.children[1].attributes, {"attr2": "value2"})
 
     def test_query_creation(self):
+        """Test XmlNode.from_query() with a query format."""
         node = XmlNode.from_query('node@attr1="value1"@attr2="value2"')
         self.assertEqual(node.name, "node")
         self.assertEqual(node.attributes, {"attr1": "value1", "attr2": "value2"})
         self.assertIsNone(node.body)
         self.assertIsNone(node.children)
 
-    def test_queries_creation(self):
-        nodes = XmlNode.from_queries(
+    def test_extend_query_creation(self):
+        """Test XmlNode.from_extend_query() with a query format."""
+        nodes = XmlNode.from_extended_query(
             [
                 "NoValueNode",
                 {
@@ -65,7 +67,8 @@ class ComprehensionTestCase(unittest.TestCase):
         )
         self.assertEqual(nodes[2].children[2].body, "100")
 
-    def test_comprehensive_append(self):
+    def test_extend_query_appendent(self):
+        """Test XmlNode.append_extend_query() with a query format."""
         node = XmlNode.parse(
             {
                 "name": "node",
@@ -77,7 +80,7 @@ class ComprehensionTestCase(unittest.TestCase):
             }
         )
 
-        nodes = node.append_queries(
+        nodes = node.append_extended_query(
             [
                 "NoValueNode",
                 {
@@ -95,3 +98,27 @@ class ComprehensionTestCase(unittest.TestCase):
 
         self.assertEqual(len(node.children), 5)
         self.assertEqual(nodes, node.children[2:])
+
+    def test_extend_query_exporting(self):
+        """Test XmlNode.to_extend_query() with a query format."""
+        expected_extend_query = {
+            "root": [
+                "NoValueNode",
+                {
+                    "SHORT-NAME": "node",
+                },
+                {
+                    "ELEMENTS@type=string": [
+                        "element@hint=id",
+                        "element@unit=m",
+                        {"element@unit=m@min=0@max=100@init=50": "100"},
+                    ],
+                },
+            ]
+        }
+
+        root = XmlNode.from_extended_query(expected_extend_query)
+
+        real_extend_query = root.to_extended_query()
+
+        self.assertDictEqual(real_extend_query, expected_extend_query)

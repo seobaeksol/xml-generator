@@ -225,7 +225,7 @@ class XmlNode:
         return node
 
     @classmethod
-    def from_queries(cls, queries: list[str | dict]) -> list[XmlNode]:
+    def from_extended_query(cls, extend_query: list | dict) -> list[XmlNode] | XmlNode:
         """
         Return the XmlNode with the given queries.
         ex) queries = [
@@ -243,30 +243,47 @@ class XmlNode:
             ]
         ]
         """
-        nodes = []
-        if not isinstance(queries, list):
+        if isinstance(extend_query, dict):
+            name, body = next(iter(extend_query.items()))
+            node = XmlNode.from_query(name)
+            if body is None:
+                return node
+
+            if isinstance(body, str):
+                node.body = body
+                return node
+            if isinstance(body, list):
+                node.body = XmlNode.from_extended_query(body)
+                return node
+
             raise TypeError(
-                f"Cannot parse {type(queries)} into XmlNode, it must be a list"
+                f"Cannot parse {type(body)} into XmlNode, it must be a str or a list"
             )
 
-        for query in queries:
-            if isinstance(query, str):
-                nodes.append(XmlNode.from_query(query))
-            elif isinstance(query, dict):
-                for key, value in query.items():
-                    node = XmlNode.from_query(key)
-                    if value is None:
-                        nodes.append(node)
-                    elif isinstance(value, str):
-                        node.body = value
-                        nodes.append(node)
-                    elif isinstance(value, list):
-                        node.body = XmlNode.from_queries(value)
-                        nodes.append(node)
+        if isinstance(extend_query, list):
+            nodes = []
+            for query in extend_query:
+                if isinstance(query, str):
+                    nodes.append(XmlNode.from_query(query))
+                elif isinstance(query, dict):
+                    for key, value in query.items():
+                        node = XmlNode.from_query(key)
+                        if value is None:
+                            nodes.append(node)
+                        elif isinstance(value, str):
+                            node.body = value
+                            nodes.append(node)
+                        elif isinstance(value, list):
+                            node.body = XmlNode.from_extended_query(value)
+                            nodes.append(node)
 
-        return nodes
+            return nodes
 
-    def append_queries(self, queries: list[str | dict]) -> list[XmlNode]:
+        raise TypeError(
+            f"Cannot parse {type(extend_query)} into XmlNode, it must be a dict or a list"
+        )
+
+    def append_extended_query(self, extended_query: list[str | dict]) -> list[XmlNode]:
         """
         With the given queries, append the XmlNode objects into children and return it.
         ex) queries = [
@@ -290,7 +307,7 @@ class XmlNode:
         if isinstance(self.body, str):
             raise ValueError("Cannot append queries to a XmlNode with a body string")
 
-        nodes = XmlNode.from_queries(queries)
+        nodes = XmlNode.from_extended_query(extended_query)
 
         self.body.extend(nodes)
 
@@ -304,6 +321,28 @@ class XmlNode:
         return (
             f"XmlNode(name={self.name}, attributes={self.attributes}, body={body_info})"
         )
+
+    def to_query(self):
+        """Return the XmlNode as a query string."""
+        query = self.name
+        for key, value in self.attributes.items():
+            query += f"@{key}={value}"
+        return query
+
+    def to_extended_query(self):
+        """Return the XmlNode as an extend query string."""
+        query = self.to_query()
+
+        if isinstance(self.body, str):
+            return {query: self.body}
+
+        if isinstance(self.body, list):
+            return {query: [child.to_extended_query() for child in self.body]}
+
+        if self.body is None:
+            return query
+
+        raise TypeError(f"Cannot parse {type(self.body)} into XmlNode")
 
 
 class XmlBuilder(TreeBuilder):

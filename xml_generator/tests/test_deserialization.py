@@ -1,5 +1,4 @@
 import unittest
-
 from xml_generator.types import XmlParser
 
 

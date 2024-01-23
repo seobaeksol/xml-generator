@@ -12,7 +12,7 @@ Comprehensive XML generator for Python
 ## Installation
 
 ```bash
-pip install xml-generator
+pip install xml-generator-seobaeksol
 ```
 
 ## Usage

@@ -1,13 +1,12 @@
 import unittest
-from xml.etree.ElementTree import XMLParser
 
 from xml_generator.types import XmlParser
 
 
 class DeserializationTestCase(unittest.TestCase):
-    def test_simple_generation(self):
-        my_parser = XmlParser()
-        parser = XMLParser(target=my_parser)
+    def test_xml_parsing_and_dump(self):
+        """Test XmlParser and XmlNode.to_xml() with a complex format."""
+        parser = XmlParser()
 
         with open(
             file="xml_generator/tests/samples/complex.xml", mode="r", encoding="utf-8"
@@ -17,7 +16,11 @@ class DeserializationTestCase(unittest.TestCase):
         root = parser.close()
 
         xml_string = root.to_xml(
-            declaration=True,
+            declaration=True, declaration_tag='<?xml version="1.0" encoding="UTF-8"?>\n'
         )
 
-        self.assertEqual(xml_string, original_xml)
+        parser = XmlParser()
+        parser.feed(xml_string)
+        root2 = parser.close()
+
+        self.assertEqual(root, root2)

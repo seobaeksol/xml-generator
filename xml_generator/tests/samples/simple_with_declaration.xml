@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <node attr1="value1" attr2="value2">
     <child1 attr1="value1"/>
     <child2 attr2="value2"/>

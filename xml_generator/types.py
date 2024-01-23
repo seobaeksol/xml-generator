@@ -1,6 +1,6 @@
 from __future__ import annotations
 from typing import Any, override
-from xml.etree.ElementTree import TreeBuilder
+from xml.etree.ElementTree import TreeBuilder, XMLParser
 
 
 Query = str
@@ -306,7 +306,7 @@ class XmlNode:
         )
 
 
-class XmlParser(TreeBuilder):
+class XmlBuilder(TreeBuilder):
     default_ns = ""
     ns_stack = []
     ns_dict = {}
@@ -334,10 +334,14 @@ class XmlParser(TreeBuilder):
 
         self.current = XmlNode(name, attrs, parent=self.current)
         if self.current.parent is None:
+            # If the current node is the root node, do nothing
             return
 
         if not isinstance(self.current.parent.body, list):
+            # If the parent node's body is not a list, make it a list
             self.current.parent.body = []
+
+        # Append the current node to the parent node's body
         self.current.parent.body.append(self.current)
 
     @override
@@ -366,3 +370,12 @@ class XmlParser(TreeBuilder):
     @override
     def close(self):
         return self.current
+
+
+class XmlParser(XMLParser):
+    def __init__(self, *, encoding=None) -> None:
+        super().__init__(target=XmlBuilder(), encoding=encoding)
+
+    @override
+    def close(self) -> XmlNode:
+        return self.target.close()

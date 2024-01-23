@@ -98,3 +98,27 @@ class ComprehensionTestCase(unittest.TestCase):
 
         self.assertEqual(len(node.children), 5)
         self.assertEqual(nodes, node.children[2:])
+
+    def test_extend_query_exporting(self):
+        """Test XmlNode.to_extend_query() with a query format."""
+        expected_extend_query = {
+            "root": [
+                "NoValueNode",
+                {
+                    "SHORT-NAME": "node",
+                },
+                {
+                    "ELEMENTS@type=string": [
+                        "element@hint=id",
+                        "element@unit=m",
+                        {"element@unit=m@min=0@max=100@init=50": "100"},
+                    ],
+                },
+            ]
+        }
+
+        root = XmlNode.from_extend_query(expected_extend_query)
+
+        real_extend_query = root.to_extend_query()
+
+        self.assertDictEqual(real_extend_query, expected_extend_query)

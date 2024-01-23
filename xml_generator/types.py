@@ -225,7 +225,7 @@ class XmlNode:
         return node
 
     @classmethod
-    def from_extend_query(cls, extend_query: list | dict) -> list[XmlNode] | XmlNode:
+    def from_extended_query(cls, extend_query: list | dict) -> list[XmlNode] | XmlNode:
         """
         Return the XmlNode with the given queries.
         ex) queries = [
@@ -253,7 +253,7 @@ class XmlNode:
                 node.body = body
                 return node
             if isinstance(body, list):
-                node.body = XmlNode.from_extend_query(body)
+                node.body = XmlNode.from_extended_query(body)
                 return node
 
             raise TypeError(
@@ -274,7 +274,7 @@ class XmlNode:
                             node.body = value
                             nodes.append(node)
                         elif isinstance(value, list):
-                            node.body = XmlNode.from_extend_query(value)
+                            node.body = XmlNode.from_extended_query(value)
                             nodes.append(node)
 
             return nodes
@@ -283,7 +283,7 @@ class XmlNode:
             f"Cannot parse {type(extend_query)} into XmlNode, it must be a dict or a list"
         )
 
-    def append_extend_query(self, queries: list[str | dict]) -> list[XmlNode]:
+    def append_extended_query(self, extended_query: list[str | dict]) -> list[XmlNode]:
         """
         With the given queries, append the XmlNode objects into children and return it.
         ex) queries = [
@@ -307,7 +307,7 @@ class XmlNode:
         if isinstance(self.body, str):
             raise ValueError("Cannot append queries to a XmlNode with a body string")
 
-        nodes = XmlNode.from_extend_query(queries)
+        nodes = XmlNode.from_extended_query(extended_query)
 
         self.body.extend(nodes)
 
@@ -329,7 +329,7 @@ class XmlNode:
             query += f"@{key}={value}"
         return query
 
-    def to_extend_query(self):
+    def to_extended_query(self):
         """Return the XmlNode as an extend query string."""
         query = self.to_query()
 
@@ -337,7 +337,7 @@ class XmlNode:
             return {query: self.body}
 
         if isinstance(self.body, list):
-            return {query: [child.to_extend_query() for child in self.body]}
+            return {query: [child.to_extended_query() for child in self.body]}
 
         if self.body is None:
             return query

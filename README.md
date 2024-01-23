@@ -40,28 +40,30 @@ node = XmlNode.parse(
 )
 ```
 
-Parse Comprehensive format with quries
+Create a XmlNode with a query
 
 ```python
 node = XmlNode.from_query('node@attr1="value1"@attr2="value2"')
 ```
 
+Create a XmlNode with a extended query
+
 ```python
-nodes = XmlNode.from_queries(
-    [
-        "NoValueNode",
-        {
-            "SHORT-NAME": "node",
-        },
-        {
-            "ELEMENTS@type='string'": [
-                "element@hint='id'",
-                "element@unit='m'",
-                {"element@unit='m'@min='0'@max='100'@init='50'": "100"},
-            ],
-        },
-    ]
-)
+extend_query = {
+            "root": [
+                "NoValueNode",
+                {
+                    "SHORT-NAME": "node",
+                },
+                {
+                    "ELEMENTS@type=string": [
+                        "element@hint=id",
+                        "element@unit=m",
+                        {"element@unit=m@min=0@max=100@init=50": "100"},
+                    ],
+                },
+            ]
+        }
 ```
 
 ### Searching a specific node

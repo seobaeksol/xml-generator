@@ -35,7 +35,7 @@ class ComprehensionTestCase(unittest.TestCase):
 
     def test_extend_query_creation(self):
         """Test XmlNode.from_extend_query() with a query format."""
-        nodes = XmlNode.from_extend_query(
+        nodes = XmlNode.from_extended_query(
             [
                 "NoValueNode",
                 {
@@ -80,7 +80,7 @@ class ComprehensionTestCase(unittest.TestCase):
             }
         )
 
-        nodes = node.append_extend_query(
+        nodes = node.append_extended_query(
             [
                 "NoValueNode",
                 {
@@ -117,8 +117,8 @@ class ComprehensionTestCase(unittest.TestCase):
             ]
         }
 
-        root = XmlNode.from_extend_query(expected_extend_query)
+        root = XmlNode.from_extended_query(expected_extend_query)
 
-        real_extend_query = root.to_extend_query()
+        real_extend_query = root.to_extended_query()
 
         self.assertDictEqual(real_extend_query, expected_extend_query)

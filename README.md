@@ -83,6 +83,28 @@ with open('sample.xml', 'w', encoding='utf-8') as f:
     f.write(node.to_xml())
 ```
 
+### Read a xml file
+
+Use `XmlParser` class for reading a xml file that return `XmlNode` by `close()` method.
+It is sub-class of `xml.etree.ElementTree.XMLParser` built-in python class.
+
+```python
+from xml_generator.types import XmlParser
+
+parser = XmlParser()
+
+with open(
+    file="xml_generator/tests/samples/complex.xml", mode="r", encoding="utf-8"
+) as f:
+    original_xml = f.read()
+    parser.feed(original_xml)
+root = parser.close()
+
+xml_string = root.to_xml(
+    declaration=True, declaration_tag='<?xml version="1.0" encoding="UTF-8"?>\n'
+)
+```
+
 ## Contributing
 
 Coming soon.

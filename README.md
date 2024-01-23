@@ -76,7 +76,7 @@ child1 = node.find("child1@attr1")
 child2 = node.find("child2")
 ```
 
-### Generate a xml file
+### Serialization
 
 Using the `to_xml()` function that return the XmlNode as an XML string.
 
@@ -85,7 +85,13 @@ with open('sample.xml', 'w', encoding='utf-8') as f:
     f.write(node.to_xml())
 ```
 
-### Read a xml file
+Using the `to_extend_query()` function that return the extended query object as an XML string.
+
+```python
+extended_query_obj = root.to_extended_query()
+```
+
+### Deserialization
 
 Use `XmlParser` class for reading a xml file that return `XmlNode` by `close()` method.
 It is sub-class of `xml.etree.ElementTree.XMLParser` built-in python class.

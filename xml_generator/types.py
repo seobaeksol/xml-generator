@@ -225,7 +225,7 @@ class XmlNode:
         return node
 
     @classmethod
-    def from_queries(cls, queries: list[str | dict]) -> list[XmlNode]:
+    def from_extend_query(cls, queries: list[str | dict]) -> list[XmlNode]:
         """
         Return the XmlNode with the given queries.
         ex) queries = [
@@ -261,12 +261,12 @@ class XmlNode:
                         node.body = value
                         nodes.append(node)
                     elif isinstance(value, list):
-                        node.body = XmlNode.from_queries(value)
+                        node.body = XmlNode.from_extend_query(value)
                         nodes.append(node)
 
         return nodes
 
-    def append_queries(self, queries: list[str | dict]) -> list[XmlNode]:
+    def append_extend_query(self, queries: list[str | dict]) -> list[XmlNode]:
         """
         With the given queries, append the XmlNode objects into children and return it.
         ex) queries = [
@@ -290,7 +290,7 @@ class XmlNode:
         if isinstance(self.body, str):
             raise ValueError("Cannot append queries to a XmlNode with a body string")
 
-        nodes = XmlNode.from_queries(queries)
+        nodes = XmlNode.from_extend_query(queries)
 
         self.body.extend(nodes)
 

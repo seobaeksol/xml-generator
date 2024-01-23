@@ -1,5 +1,10 @@
 import unittest
 
+import sys
+
+sys.path.append("../../")
+sys.path.append("../")
+sys.path.append("C:\\Users\\F2023027\\Desktop\\Projects\\xml-generator")
 from xml_generator import XmlNode
 
 
@@ -26,14 +31,16 @@ class ComprehensionTestCase(unittest.TestCase):
         self.assertEqual(node.children[1].attributes, {"attr2": "value2"})
 
     def test_query_creation(self):
+        """Test XmlNode.from_query() with a query format."""
         node = XmlNode.from_query('node@attr1="value1"@attr2="value2"')
         self.assertEqual(node.name, "node")
         self.assertEqual(node.attributes, {"attr1": "value1", "attr2": "value2"})
         self.assertIsNone(node.body)
         self.assertIsNone(node.children)
 
-    def test_queries_creation(self):
-        nodes = XmlNode.from_queries(
+    def test_extend_query_creation(self):
+        """Test XmlNode.from_extend_query() with a query format."""
+        nodes = XmlNode.from_extend_query(
             [
                 "NoValueNode",
                 {
@@ -65,7 +72,8 @@ class ComprehensionTestCase(unittest.TestCase):
         )
         self.assertEqual(nodes[2].children[2].body, "100")
 
-    def test_comprehensive_append(self):
+    def test_extend_query_appendent(self):
+        """Test XmlNode.append_extend_query() with a query format."""
         node = XmlNode.parse(
             {
                 "name": "node",
@@ -77,7 +85,7 @@ class ComprehensionTestCase(unittest.TestCase):
             }
         )
 
-        nodes = node.append_queries(
+        nodes = node.append_extend_query(
             [
                 "NoValueNode",
                 {

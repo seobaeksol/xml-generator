@@ -187,13 +187,15 @@ class XmlNode:
         """
         xml = declaration_tag if declaration else ""
         indent = indent_char * indent_size * depth
+        attr = self._attributes_to_xml()
+        attr_space = " " if attr else ""
 
         if self.body is None:
-            xml += f"{indent}<{self.name} {self._attributes_to_xml()}/>\n"
+            xml += f"{indent}<{self.name}{attr_space}{self._attributes_to_xml()}/>\n"
         elif isinstance(self.body, str):
-            xml += f"{indent}<{self.name} {self._attributes_to_xml()}>{self.body}</{self.name}>\n"
+            xml += f"{indent}<{self.name}{attr_space}{self._attributes_to_xml()}>{self.body}</{self.name}>\n"
         elif isinstance(self.body, list):
-            xml += f"{indent}<{self.name} {self._attributes_to_xml()}>\n"
+            xml += f"{indent}<{self.name}{attr_space}{self._attributes_to_xml()}>\n"
             for child in self.body:
                 xml += child.to_xml(
                     depth + 1, indent_char=indent_char, indent_size=indent_size

@@ -7,6 +7,11 @@ Query = str
 QueryDict = dict[Query, dict | str | None]
 
 
+def is_valid_value_type(value):
+    """Return True if the value is a valid XML value type."""
+    return isinstance(value, (str, int, float, bool))
+
+
 class XmlNode:
     def __init__(
         self,
@@ -192,7 +197,7 @@ class XmlNode:
 
         if self.body is None:
             xml += f"{indent}<{self.name}{attr_space}{self._attributes_to_xml()}/>\n"
-        elif isinstance(self.body, str):
+        elif is_valid_value_type(self.body):
             xml += f"{indent}<{self.name}{attr_space}{self._attributes_to_xml()}>{self.body}</{self.name}>\n"
         elif isinstance(self.body, list):
             xml += f"{indent}<{self.name}{attr_space}{self._attributes_to_xml()}>\n"
@@ -251,7 +256,7 @@ class XmlNode:
             if body is None:
                 return node
 
-            if isinstance(body, str):
+            if is_valid_value_type(body):
                 node.body = body
                 return node
             if isinstance(body, list):
@@ -272,7 +277,7 @@ class XmlNode:
                         node = XmlNode.from_query(key)
                         if value is None:
                             nodes.append(node)
-                        elif isinstance(value, str):
+                        elif is_valid_value_type(value):
                             node.body = value
                             nodes.append(node)
                         elif isinstance(value, list):

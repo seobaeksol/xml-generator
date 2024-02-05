@@ -122,3 +122,35 @@ class ComprehensionTestCase(unittest.TestCase):
         real_extend_query = root.to_extended_query()
 
         self.assertDictEqual(real_extend_query, expected_extend_query)
+
+    def test_int_type_convertion(self):
+        """Test XmlNode.parse() with an integer value."""
+        node = XmlNode.parse(
+            {
+                "name": "node",
+                "attributes": {"attr1": 1},
+                "body": [
+                    {"name": "child1", "attributes": {"attr1": 1}},
+                    {"name": "child2", "attributes": {"attr2": 2}},
+                ],
+            }
+        )
+
+        self.assertEqual(node.attributes, {"attr1": 1})
+        self.assertEqual(node.children[0].attributes, {"attr1": 1})
+
+    def test_float_type_convertion(self):
+        """Test XmlNode.parse() with a float value."""
+        node = XmlNode.parse(
+            {
+                "name": "node",
+                "attributes": {"attr1": 1.1},
+                "body": [
+                    {"name": "child1", "attributes": {"attr1": 1.1}},
+                    {"name": "child2", "attributes": {"attr2": 2.2}},
+                ],
+            }
+        )
+
+        self.assertEqual(node.attributes, {"attr1": 1.1})
+        self.assertEqual(node.children[0].attributes, {"attr1": 1.1})

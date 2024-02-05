@@ -154,3 +154,15 @@ class ComprehensionTestCase(unittest.TestCase):
 
         self.assertEqual(node.attributes, {"attr1": 1.1})
         self.assertEqual(node.children[0].attributes, {"attr1": 1.1})
+
+    def test_dict_type_convertion(self):
+        """Test XmlNode.parse() with a dictionary value."""
+        node = XmlNode.from_extended_query(
+            {
+                "TRANSMISSION-MODE-FALSE-TIMING": {
+                    "EVENT-CONTROLLED-TIMING": {"NUMBER-OF-REPETITIONS": "0"}
+                },
+            }
+        )
+
+        self.assertEqual(node.children[0].children[0].body, "0")

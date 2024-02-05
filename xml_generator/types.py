@@ -38,6 +38,10 @@ class XmlNode:
     @property
     def children(self) -> list[XmlNode] | None:
         """Return the children of the XmlNode object."""
+
+        if isinstance(self.body, XmlNode):
+            return [self.body]
+
         if not isinstance(self.body, list):
             return None
 
@@ -259,7 +263,7 @@ class XmlNode:
             if is_valid_value_type(body):
                 node.body = body
                 return node
-            if isinstance(body, list):
+            if isinstance(body, (list, dict)):
                 node.body = XmlNode.from_extended_query(body)
                 return node
 

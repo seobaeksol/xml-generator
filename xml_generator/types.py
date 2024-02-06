@@ -210,6 +210,12 @@ class XmlNode:
                     depth + 1, indent_char=indent_char, indent_size=indent_size
                 )
             xml += f"{indent}</{self.name}>\n"
+        elif isinstance(self.body, XmlNode):
+            xml += f"{indent}<{self.name}{attr_space}{self._attributes_to_xml()}>\n"
+            xml += self.body.to_xml(
+                depth + 1, indent_char=indent_char, indent_size=indent_size
+            )
+            xml += f"{indent}</{self.name}>\n"
 
         if depth == 0:
             xml = xml.strip()
@@ -284,7 +290,7 @@ class XmlNode:
                         elif is_valid_value_type(value):
                             node.body = value
                             nodes.append(node)
-                        elif isinstance(value, list):
+                        elif isinstance(value, (list, dict)):
                             node.body = XmlNode.from_extended_query(value)
                             nodes.append(node)
 

@@ -189,6 +189,7 @@ class XmlNode:
         indent_char: str = " ",
         indent_size: int = 4,
         declaration_tag: str = '<?xml version="1.0" encoding="utf-8"?>\n',
+        folding: bool = True,
     ) -> str:
         """
         Return the XmlNode as an XML string.
@@ -199,8 +200,10 @@ class XmlNode:
         attr = self._attributes_to_xml()
         attr_space = " " if attr else ""
 
-        if self.body is None:
+        if self.body is None and folding:
             xml += f"{indent}<{self.name}{attr_space}{self._attributes_to_xml()}/>\n"
+        elif self.body is None:
+            xml += f"{indent}<{self.name}{attr_space}{self._attributes_to_xml()}></{self.name}>\n"
         elif is_valid_value_type(self.body):
             xml += f"{indent}<{self.name}{attr_space}{self._attributes_to_xml()}>{self.body}</{self.name}>\n"
         elif isinstance(self.body, list):

@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setuptools.setup(
     name="xml-generator-seobaeksol",  # Replace with your own username
-    version="0.4.5",
+    version="0.4.6",
     author="seobaeksol",
     author_email="suyoung154@example.com",
     description="Comprehensive XML generator for Python",

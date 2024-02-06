@@ -260,6 +260,9 @@ class XmlNode:
             ]
         ]
         """
+        if isinstance(extend_query, (dict, list)) and not extend_query:
+            return None
+
         if isinstance(extend_query, dict):
             name, body = next(iter(extend_query.items()))
             node = XmlNode.from_query(name)
@@ -350,11 +353,14 @@ class XmlNode:
         """Return the XmlNode as an extend query string."""
         query = self.to_query()
 
-        if isinstance(self.body, str):
+        if is_valid_value_type(self.body):
             return {query: self.body}
 
         if isinstance(self.body, list):
             return {query: [child.to_extended_query() for child in self.body]}
+
+        if isinstance(self.body, XmlNode):
+            return {query: self.body.to_extended_query()}
 
         if self.body is None:
             return query

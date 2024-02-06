@@ -1,4 +1,5 @@
 import unittest
+import json
 
 from xml_generator import XmlNode
 
@@ -166,3 +167,12 @@ class ComprehensionTestCase(unittest.TestCase):
         )
 
         self.assertEqual(node.children[0].children[0].body, "0")
+
+    def test_large_extended_query(self):
+        """Test XmlNode.from_extended_query() with a large query. TODO: Add large validation rules."""
+        with open(
+            "xml_generator/tests/samples/practice.json", "r", encoding="utf-8"
+        ) as f:
+            raw = json.load(f)
+
+            XmlNode.from_extended_query(raw)

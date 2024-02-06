@@ -52,3 +52,14 @@ class SerializationTestCase(unittest.TestCase):
             node[1].to_xml(),
             "<TRANSMISSION-MODE-TRUE-TIMING>\n    <EVENT-CONTROLLED-TIMING>\n        <NUMBER-OF-REPETITIONS>0</NUMBER-OF-REPETITIONS>\n    </EVENT-CONTROLLED-TIMING>\n</TRANSMISSION-MODE-TRUE-TIMING>",
         )
+
+    def test_folding(self):
+        """Test XmlNode.to_xml() with folding."""
+        root = create_sample_node()
+
+        with open(
+            "xml_generator/tests/samples/simple_folding.xml", "r", encoding="utf-8"
+        ) as f:
+            expected = f.read()
+
+        self.assertEqual(root.to_xml(folding=False), expected)

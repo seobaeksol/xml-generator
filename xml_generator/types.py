@@ -210,13 +210,19 @@ class XmlNode:
             xml += f"{indent}<{self.name}{attr_space}{self._attributes_to_xml()}>\n"
             for child in self.body:
                 xml += child.to_xml(
-                    depth + 1, indent_char=indent_char, indent_size=indent_size
+                    depth + 1,
+                    indent_char=indent_char,
+                    indent_size=indent_size,
+                    folding=folding,
                 )
             xml += f"{indent}</{self.name}>\n"
         elif isinstance(self.body, XmlNode):
             xml += f"{indent}<{self.name}{attr_space}{self._attributes_to_xml()}>\n"
             xml += self.body.to_xml(
-                depth + 1, indent_char=indent_char, indent_size=indent_size
+                depth + 1,
+                indent_char=indent_char,
+                indent_size=indent_size,
+                folding=folding,
             )
             xml += f"{indent}</{self.name}>\n"
 

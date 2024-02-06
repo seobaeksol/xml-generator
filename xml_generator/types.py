@@ -1,4 +1,5 @@
 from __future__ import annotations
+from enum import Enum
 from typing import Any, override
 from xml.etree.ElementTree import TreeBuilder, XMLParser
 
@@ -10,6 +11,14 @@ QueryDict = dict[Query, dict | str | None]
 def is_valid_value_type(value):
     """Return True if the value is a valid XML value type."""
     return isinstance(value, (str, int, float, bool))
+
+
+class FoldingType(Enum):
+    """Enumeration for folding types."""
+
+    FOLDING = 0
+    NO_FOLDING = 1
+    NO_FOLDING_WITH_NEWLINE = 2
 
 
 class XmlNode:
@@ -189,7 +198,7 @@ class XmlNode:
         indent_char: str = " ",
         indent_size: int = 4,
         declaration_tag: str = '<?xml version="1.0" encoding="utf-8"?>\n',
-        folding: bool = True,
+        no_content_folding_type: FoldingType = FoldingType.FOLDING,
     ) -> str:
         """
         Return the XmlNode as an XML string.
@@ -200,10 +209,15 @@ class XmlNode:
         attr = self._attributes_to_xml()
         attr_space = " " if attr else ""
 
-        if self.body is None and folding:
+        if self.body is None and no_content_folding_type == FoldingType.FOLDING:
             xml += f"{indent}<{self.name}{attr_space}{self._attributes_to_xml()}/>\n"
-        elif self.body is None:
+        elif self.body is None and no_content_folding_type == FoldingType.NO_FOLDING:
             xml += f"{indent}<{self.name}{attr_space}{self._attributes_to_xml()}></{self.name}>\n"
+        elif (
+            self.body is None
+            and no_content_folding_type == FoldingType.NO_FOLDING_WITH_NEWLINE
+        ):
+            xml += f"{indent}<{self.name}{attr_space}{self._attributes_to_xml()}>\n{indent}</{self.name}>\n"
         elif is_valid_value_type(self.body):
             xml += f"{indent}<{self.name}{attr_space}{self._attributes_to_xml()}>{self.body}</{self.name}>\n"
         elif isinstance(self.body, list):
@@ -213,7 +227,7 @@ class XmlNode:
                     depth + 1,
                     indent_char=indent_char,
                     indent_size=indent_size,
-                    folding=folding,
+                    no_content_folding_type=no_content_folding_type,
                 )
             xml += f"{indent}</{self.name}>\n"
         elif isinstance(self.body, XmlNode):
@@ -222,7 +236,7 @@ class XmlNode:
                 depth + 1,
                 indent_char=indent_char,
                 indent_size=indent_size,
-                folding=folding,
+                no_content_folding_type=no_content_folding_type,
             )
             xml += f"{indent}</{self.name}>\n"
 

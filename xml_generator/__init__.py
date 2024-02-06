@@ -1,1 +1,1 @@
-from .types import XmlNode, XmlBuilder, XmlParser
+from .types import XmlNode, XmlBuilder, XmlParser, FoldingType

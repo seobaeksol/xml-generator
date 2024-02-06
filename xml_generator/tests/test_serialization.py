@@ -1,7 +1,7 @@
 import unittest
 
 from xml_generator.tests.utils import create_sample_node
-from xml_generator.types import XmlNode
+from xml_generator.types import FoldingType, XmlNode
 
 
 class SerializationTestCase(unittest.TestCase):
@@ -58,8 +58,26 @@ class SerializationTestCase(unittest.TestCase):
         root = create_sample_node()
 
         with open(
-            "xml_generator/tests/samples/simple_folding.xml", "r", encoding="utf-8"
+            "xml_generator/tests/samples/simple_no_folding.xml", "r", encoding="utf-8"
         ) as f:
             expected = f.read()
 
-        self.assertEqual(root.to_xml(folding=False), expected)
+        self.assertEqual(
+            root.to_xml(no_content_folding_type=FoldingType.NO_FOLDING), expected
+        )
+
+    def test_folding_with_new_line(self):
+        """Test XmlNode.to_xml() with folding."""
+        root = create_sample_node()
+
+        with open(
+            "xml_generator/tests/samples/simple_no_folding_with_new_line.xml",
+            "r",
+            encoding="utf-8",
+        ) as f:
+            expected = f.read()
+
+        self.assertEqual(
+            root.to_xml(no_content_folding_type=FoldingType.NO_FOLDING_WITH_NEWLINE),
+            expected,
+        )
